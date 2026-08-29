@@ -1,0 +1,12 @@
+numpy==2.2.6
+pandas==2.3.3
+scikit-learn==1.7.2
+matplotlib==3.10.9
+torch==2.13.0
+torchvision==0.28.0
+torchaudio==2.11.0
+torchsummary==1.5.1
+joblib==1.5.3
+opendatasets==0.1.22
+kaggle==1.7.4.5
+tqdm==4.70.0

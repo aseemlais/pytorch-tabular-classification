@@ -127,13 +127,10 @@ models/
 - `scaler.pkl` → fitted `StandardScaler`
 
 ## 📁 Project Structure
-
 ```text
 pytorch-tabular-classification/
 │
 ├── data/
-│   └── raw/                  # Dataset (ignored by Git)
-│
 ├── models/
 │   ├── rice_classifier.pth
 │   └── scaler.pkl
@@ -150,11 +147,10 @@ pytorch-tabular-classification/
 │
 ├── main.py
 ├── predict.py
+├── requirements.txt      
 ├── environment.yml
 ├── .gitignore
 └── README.md
-```
-
 ## 🚀 Installation & Usage
 
 ### 1. Create the Conda environment
