@@ -1,3 +1,4 @@
+import joblib
 from src.data_loader import (
     load_data,
     split_features_target,
@@ -18,6 +19,12 @@ X_train_scaled, X_val_scaled, X_test_scaled, scaler = scale_data(
     X_val,
     X_test
 )
+joblib.dump(
+    scaler,
+    "models/scaler.pkl"
+)
+
+print("Scaler saved successfully!")
 
 (
     X_train_tensor,
@@ -34,6 +41,7 @@ X_train_scaled, X_val_scaled, X_test_scaled, scaler = scale_data(
     y_val,
     y_test
 )
+
 
 print("X train:")
 print("Shape:", X_train_tensor.shape)
@@ -95,7 +103,7 @@ print("Batch y shape:", y_batch.shape)
 from src.model import RiceClassifier
 model = RiceClassifier()
 
-print(model)
+# print(model)
 X_batch, y_batch = next(iter(train_loader))
 
 predictions = model(X_batch)
@@ -139,24 +147,13 @@ print("New loss:", new_loss.item())
 from src.training import create_loss_and_optimizer, train_one_epoch
 criterion, optimizer = create_loss_and_optimizer(model)
 
-EPOCHS = 10
-
-for epoch in range(EPOCHS):
-
-    train_loss = train_one_epoch(
-        model,
-        train_loader,
-        criterion,
-        optimizer
-    )
-
-    print(
-        f"Epoch [{epoch + 1}/{EPOCHS}] "
-        f"Training Loss: {train_loss:.4f}"
-    )
-
+ 
 from src.evaluation import evaluate
 EPOCHS = 10
+
+train_losses = []
+val_losses = []
+val_accuracies = []
 
 for epoch in range(EPOCHS):
 
@@ -173,6 +170,10 @@ for epoch in range(EPOCHS):
         criterion
     )
 
+    train_losses.append(train_loss)
+    val_losses.append(val_loss)
+    val_accuracies.append(val_accuracy)
+
     print(
         f"Epoch [{epoch + 1}/{EPOCHS}] "
         f"Train Loss: {train_loss:.4f} | "
@@ -180,3 +181,71 @@ for epoch in range(EPOCHS):
         f"Val Accuracy: {val_accuracy:.4f}"
     )
 
+from src.visualization import plot_loss, plot_accuracy
+plot_loss(train_losses, val_losses)
+
+plot_accuracy(val_accuracies)
+
+test_loss, test_accuracy, test_targets, test_predictions = evaluate(
+    model,
+    test_loader,
+    criterion,
+    return_predictions=True
+)
+
+print("\nFinal Test Results")
+print("------------------")
+print(f"Test Loss: {test_loss:.4f}")
+print(f"Test Accuracy: {test_accuracy:.4f}")
+
+from sklearn.metrics import confusion_matrix, classification_report
+import matplotlib.pyplot as plt
+
+cm = confusion_matrix(
+    test_targets,
+    test_predictions
+)
+
+print("\nConfusion Matrix:")
+print(cm)
+
+print("\nClassification Report:")
+print(
+    classification_report(
+        test_targets,
+        test_predictions
+    )
+)
+
+plt.figure(figsize=(6, 5))
+
+plt.imshow(cm)
+
+plt.title("Confusion Matrix")
+plt.xlabel("Predicted Class")
+plt.ylabel("Actual Class")
+
+plt.xticks([0, 1], ["Class 0", "Class 1"])
+plt.yticks([0, 1], ["Class 0", "Class 1"])
+
+for i in range(2):
+    for j in range(2):
+        plt.text(
+            j,
+            i,
+            cm[i, j],
+            ha="center",
+            va="center"
+        )
+
+plt.colorbar()
+
+plt.show()
+
+import torch
+torch.save(
+    model.state_dict(),
+    "models/rice_classifier.pth"
+)
+
+print("\nModel saved successfully!")

@@ -1,12 +1,15 @@
 import torch
 
 
-def evaluate(model, data_loader, criterion):
+def evaluate(model, data_loader, criterion, return_predictions=False):
     model.eval()
 
     total_loss = 0.0
     correct = 0
     total = 0
+
+    all_predictions = []
+    all_targets = []
 
     with torch.no_grad():
 
@@ -29,8 +32,24 @@ def evaluate(model, data_loader, criterion):
 
             total += y_batch.size(0)
 
+            if return_predictions:
+                all_predictions.extend(
+                    predicted_classes.squeeze(1).cpu().numpy()
+                )
+
+                all_targets.extend(
+                    y_batch.cpu().numpy()
+                )
+
     average_loss = total_loss / len(data_loader)
     accuracy = correct / total
 
-    return average_loss, accuracy
+    if return_predictions:
+        return (
+            average_loss,
+            accuracy,
+            all_targets,
+            all_predictions
+        )
 
+    return average_loss, accuracy
