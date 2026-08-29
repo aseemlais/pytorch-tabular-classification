@@ -14,10 +14,12 @@ venv/
 data/raw/
 data/processed/
 
+# Kaggle credentials
+kaggle.json
+
 # VS Code
 .vscode/
 
 # OS files
 .DS_Store
 Thumbs.db
-
